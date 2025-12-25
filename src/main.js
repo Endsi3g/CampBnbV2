@@ -49,17 +49,16 @@ router
   .register('/profile', profilePage)
   .register('/settings', settingsPage);
 
-// Register service worker for PWA support  
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(
-      (registration) => {
-        console.log('SW registered: ', registration);
-      },
-      (error) => {
-        console.log('SW registration failed: ', error);
-      }
-    );
+// Register service worker for PWA support (production only)
+// vite-plugin-pwa generates sw.js only in production builds
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('SW registered: ', registration);
+    } catch (error) {
+      console.log('SW registration failed: ', error);
+    }
   });
 }
 
@@ -69,3 +68,4 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
 }
 
 console.log('🏕️ CampBnB PWA initialized');
+
